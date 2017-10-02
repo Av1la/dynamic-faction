@@ -1,11 +1,7 @@
-// faction.p
-
 /*
 
 	Faction_Create(name[], embed_color[], hex_color)
 	Faction_Delete();
-
-	*Faction_SendMessage();
 
 	Faction_SetCreated(faction, bool:created)
 	Faction_SetUsable(faction, bool:usable)

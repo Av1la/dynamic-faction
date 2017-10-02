@@ -1,6 +1,4 @@
 
-#define MEMBERLIST_LIMIT 100
-
 /*
 	MemberList_Add(player_name[], faction, rank)
 	MemberList_Remove(memberid)
@@ -26,6 +24,9 @@
 	MemberList_GetJoinDate(memberid)
 	MemberList_GetLastPromotion(memberid)
 */
+
+#define MEMBERLIST_LIMIT 100
+
 
 enum E_MEMBERLIST
 {

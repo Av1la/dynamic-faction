@@ -35,7 +35,7 @@
 command(administrarfaccoes, playerid, params [])
 {
 	//if(IsPlayerAdmin(playerid))
-	AdminFaction_ShowMenu(playerid);
+	Interface_AFaction(playerid);
 	return true;
 }
 

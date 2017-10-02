@@ -2,18 +2,18 @@
 
 
 /*
-	AdminFaction_ShowMenu(playerid)
+    Interface_AFaction(playerid)
 
-	AdminFaction_ShowCreateMenu(playerid)
-	AdminFaction_ShowDeleteMenu(playerid)
-	AdminFaction_ShowListMenu(playerid)
+	Interface_AFactionCreate(playerid)
+	Interface_AFactionDelete(playerid)
+	Interface_AFactionList(playerid)
 
-	AdminFaction_ShowEditMenu(playerid, faction)
-	AdminFaction_EditMenu(playerid, faction, option)
+	Interface_AFactionEdit(playerid, faction)
+	Interface_AFactionEditOpt(playerid, faction, option)
 */
 
 
-stock AdminFaction_ShowMenu(playerid)
+stock Interface_AFaction(playerid)
 {
     inline Response(pid, dialogid, response, listitem, string:inputtext[])
     {
@@ -24,22 +24,22 @@ stock AdminFaction_ShowMenu(playerid)
 
     	switch(listitem)
     	{
-    		case 0: return AdminFaction_ShowCreateMenu(playerid);
-    		case 1: return AdminFaction_ShowDeleteMenu(playerid);
-    		case 2: return AdminFaction_ShowListMenu(playerid);
+    		case 0: return Interface_AFactionCreate(playerid);
+    		case 1: return Interface_AFactionDelete(playerid);
+    		case 2: return Interface_AFactionList(playerid);
     	}
     }
     Dialog_ShowCallback(playerid, using inline Response, DIALOG_STYLE_LIST, "Admin Faction Interface -> Main", "Criar uma Facção\nApagar uma Facção\nListar Facções", "Selecionar", "Fechar");
 	return true;
 }
 
-stock AdminFaction_ShowCreateMenu(playerid)
+stock Interface_AFactionCreate(playerid)
 {
-	AdminFaction_ShowEditMenu(playerid, Faction_Create("Nome Indefindo", "{FFFFFF}", 0xFFFFFF));
+	Interface_AFactionEdit(playerid, Faction_Create("Nome Indefindo", "{FFFFFF}", 0xFFFFFF));
 	return true;
 }
 
-stock AdminFaction_ShowDeleteMenu(playerid)
+stock Interface_AFactionDelete(playerid)
 {
 	new dialog_list_content[512] = "#id\t#nome\t#total membros\t#lider\n",
 		dialog_list[FACTION_LIMIT],
@@ -50,10 +50,10 @@ stock AdminFaction_ShowDeleteMenu(playerid)
         #pragma unused pid, dialogid, response, inputtext
 
     	if(!response)
-    		return AdminFaction_ShowMenu(playerid);
+    		return Interface_AFaction(playerid);
 
     	Faction_Delete(dialog_list[listitem]);
-    	AdminFaction_ShowMenu(playerid);
+    	Interface_AFaction(playerid);
     }
     
     for(new i = 0; i < FACTION_LIMIT; i++) 
@@ -72,7 +72,7 @@ stock AdminFaction_ShowDeleteMenu(playerid)
 	return true;
 }
 
-stock AdminFaction_ShowListMenu(playerid)
+stock Interface_AFactionList(playerid)
 {
 	new dialog_list_content[512] = "#id\t#nome\t#total membros\t#lider\n",
 		dialog_list[FACTION_LIMIT],
@@ -84,9 +84,9 @@ stock AdminFaction_ShowListMenu(playerid)
         #pragma unused pid, dialogid, response, inputtext
 
     	if(!response)
-    		return AdminFaction_ShowMenu(playerid);
+    		return Interface_AFaction(playerid);
 
-    	AdminFaction_ShowEditMenu(playerid, dialog_list[listitem]);
+    	Interface_AFactionEdit(playerid, dialog_list[listitem]);
     }
 
     
@@ -114,16 +114,16 @@ stock AdminFaction_ShowListMenu(playerid)
 	return true;
 }
 
-stock AdminFaction_ShowEditMenu(playerid, faction)
+stock Interface_AFactionEdit(playerid, faction)
 {
     inline Response(pid, dialogid, response, listitem, string:inputtext[])
     {
         #pragma unused pid, dialogid, response, inputtext
 
     	if(!response)
-    		return AdminFaction_ShowMenu(playerid);
+    		return Interface_AFaction(playerid);
 
-		AdminFaction_EditMenu(playerid, faction, listitem);
+		Interface_AFactionEditOpt(playerid, faction, listitem);
     }    	
 
     Dialog_ShowCallback(playerid, using inline Response, DIALOG_STYLE_LIST, 
@@ -131,39 +131,39 @@ stock AdminFaction_ShowEditMenu(playerid, faction)
 	return true;
 }
 
-stock AdminFaction_EditMenu(playerid, faction, option)
+stock Interface_AFactionEditOpt(playerid, faction, option)
 {
     inline Response(pid, dialogid, response, listitem, string:inputtext[])
     {
         #pragma unused pid, dialogid, response, listitem
 		
     	if(!response) 
-    		return AdminFaction_ShowEditMenu(playerid, faction);
+    		return Interface_AFactionEdit(playerid, faction);
 
 		switch(option)
 		{
 			case 0:
 			{
 				Faction_SetName(faction, inputtext);
-				AdminFaction_ShowEditMenu(playerid, faction);
+				Interface_AFactionEdit(playerid, faction);
 				return true;
 			}
 			case 1:
 			{
 				Faction_SetEmbedColor(faction, inputtext);
-				AdminFaction_ShowEditMenu(playerid, faction);
+				Interface_AFactionEdit(playerid, faction);
 				return true;
 			}
 			case 2:
 			{
 				Faction_SetHexColor(faction, strval(inputtext));
-				AdminFaction_ShowEditMenu(playerid, faction);
+				Interface_AFactionEdit(playerid, faction);
 				return true;
 			}
 			case 3:
 			{
 				Faction_SetMaxMembers(faction, strval(inputtext));
-				AdminFaction_ShowEditMenu(playerid, faction);
+				Interface_AFactionEdit(playerid, faction);
 				return true;
 			}
 		}
