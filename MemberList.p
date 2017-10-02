@@ -5,6 +5,8 @@
 	MemberList_Add(player_name[], faction, rank)
 	MemberList_Remove(memberid)
 
+	MemberList_SendMessage(faction, text[])
+
 	MemberList_SetUsable(memberid, bool usable)
 	MemberList_SetLeader(memberid, bool leader)
 	MemberList_SetName(memberid, name)
@@ -98,6 +100,36 @@ stock MemberList_Remove(memberid)
 	return true;
 }
 
+/**
+ * MemberList_SendMessage
+ *
+ * envia uma mensagem para todos os membros da faccao
+ *
+ * @param (int) (faction) faction id
+ * @param (string) (text) texto a ser enviado
+ * @return (bool) (undefined)
+ */
+stock MemberList_SendMessage(faction, text[]) 
+{
+	new member, pfaction;
+	for(new i = 0; i < MAX_PLAYERS; i++)
+	{
+		if(!IsPlayerConnected(i))
+			continue;
+
+		member  = MemberList_GetMemberIdById(i);
+		if(member < 0)
+			continue;
+
+		pfaction = MemberList_GetFaction(member); 
+		if(pfaction != faction)
+			continue;
+
+		SendClientMessage(i, -1, text);
+	}
+	return true;
+}
+
 /*                      
 ***  #####  ##### ######
 ***  ##     ##      ##   
@@ -117,6 +149,9 @@ stock MemberList_Remove(memberid)
  */
 stock MemberList_IsUsable(memberid)
 {
+	if(memberid == -1)
+		return -1;
+
 	return MemberList[memberid][MemberList_Usable];
 }
 

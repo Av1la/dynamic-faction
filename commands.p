@@ -9,31 +9,29 @@
 		* /convidar
 
 	comandos para membros
-		* /r
-		* /membros
-		* /sairfaccao
-	
-
-	MemberList_Add(player_name[], faction, rank)
-	MemberList_Remove(memberid)
-
-	MemberList_SetUsable(memberid, usable)
-	MemberList_SetName(memberid, name)
-	MemberList_SetFaction(memberid, faction)
-	MemberList_SetRank(memberid, rank)
-	MemberList_SetJoinDate(memberid, join_date)
-	MemberList_SetLastPromotion(memberid, promotion)
-
-	MemberList_GetMemberIdById(playerid)
-	MemberList_IsUsable(memberid)
-	MemberList_GetName(memberid)
-	MemberList_GetFaction(memberid)
-	MemberList_GetRank(memberid)
-	MemberList_GetJoinDate(memberid)
-	MemberList_GetLastPromotion(memberid)
-
+		/r
+		/membros
+		/sairfaccao
 */
 
+
+
+/*
+	
+	COMANDOS PARA ADMINISTRADORES
+	*****************************
+	*****************************
+*/
+
+
+
+/**
+ * Comando - /administrarfaccoes
+ *
+ * Exibe um dialog para gerenciamento de facções
+ *
+ * @return (bool) (undefined)
+ */
 command(administrarfaccoes, playerid, params [])
 {
 	//if(IsPlayerAdmin(playerid))
@@ -41,6 +39,14 @@ command(administrarfaccoes, playerid, params [])
 	return true;
 }
 
+/**
+ * Comando - /darlider
+ *
+ * Adiciona um jogador na lista de membros da facção como lider.
+ *
+ * @param (int) (playerid) player id
+ * @return (bool) (undefined)
+ */
 command(darlider, playerid, params []) 
 {
 	new dialog_list_content[512] = "#id\t#nome\n",
@@ -88,5 +94,118 @@ command(darlider, playerid, params [])
     }
 
     Dialog_ShowCallback(playerid, using inline Response, DIALOG_STYLE_TABLIST_HEADERS, "Adicionando um novo Lider", dialog_list_content, "Selecionar", "Voltar");
+	return true;
+}
+
+
+
+/*
+	
+	COMANDOS PARA MEMBROS
+	*********************
+	*********************
+
+*/
+
+
+
+/**
+ * Comando - /r
+ *
+ * Envia uma mensagem para todos online na facção.
+ *
+ * @param (string) (text) texto a ser enviado
+ * @return (bool) (undefined)
+ */
+command(r, playerid, params []) 
+{
+	new member, faction, player_name[MAX_PLAYER_NAME], tmp_str[128];
+	member  = MemberList_GetMemberIdById(playerid);
+
+	if(member < 0) 
+	{
+		SendClientMessage(playerid, -1, "Você não faz parte de nenhuma facção.");
+		return true;
+	}
+
+	faction = MemberList_GetFaction(member);
+
+	if(!Faction_IsCreated(faction))
+	{
+		SendClientMessage(playerid, -1, "Houve algum problema com sua facção..");
+		SendClientMessage(playerid, -1, "Você foi removido da lista de membros automaticamente, consulte um administrador..");
+		MemberList_Remove(member);
+		return true;
+	}
+
+	GetPlayerName(playerid, player_name, sizeof player_name);
+	format(tmp_str, sizeof tmp_str, "%s via Radio: %s", player_name, params);
+	MemberList_SendMessage(faction, tmp_str);
+	return true;
+}
+
+/**
+ * Comando - /membros
+ *
+ * exibe a lista de membros online da facção
+ *
+ * @return (bool) (undefined)
+ */
+command(membros, playerid, params [])
+{
+	new member, faction, tmp_str[128];
+	member  = MemberList_GetMemberIdById(playerid);
+
+	if(member < 0) 
+	{
+		SendClientMessage(playerid, -1, "Você não faz parte de nenhuma facção.");
+		return true;
+	}
+
+	faction = MemberList_GetFaction(member);
+
+	if(!Faction_IsCreated(faction))
+	{
+		SendClientMessage(playerid, -1, "Houve algum problema com sua facção..");
+		SendClientMessage(playerid, -1, "Você foi removido da lista de membros automaticamente, consulte um administrador..");
+		MemberList_Remove(member);
+		return true;
+	}
+
+	SendClientMessage(playerid, -1, "Lista de membros online:");
+	for(new i = 0; i < MEMBERLIST_LIMIT; i++)
+	{
+		if(!MemberList_IsUsable(i))
+			continue;
+
+		if(MemberList_GetFaction(i) != faction)
+			continue;
+
+		format(tmp_str, sizeof tmp_str, "%s / %d", MemberList_GetName(i), MemberList_GetRank(i));
+		SendClientMessage(playerid, -1, tmp_str);
+	}
+	return true;
+}
+
+
+/**
+ * Comando - /sairfaccao
+ *
+ * Usado para um membro deixar a facção atual.
+ *
+ * @return (bool) (undefined)
+ */
+command(sairfaccao, playerid, params [])
+{
+	new member = MemberList_GetMemberIdById(playerid);
+
+	if(member < 0) 
+	{
+		SendClientMessage(playerid, -1, "Você não faz parte de nenhuma facção.");
+		return true;
+	}
+
+	SendClientMessage(playerid, -1, "Você foi removido da lista de membros da facção.");
+	MemberList_Remove(member);
 	return true;
 }
