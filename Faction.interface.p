@@ -17,7 +17,7 @@ stock Interface_AFaction(playerid)
 {
     inline Response(pid, dialogid, response, listitem, string:inputtext[])
     {
-        #pragma unused pid, dialogid, response, inputtext
+        #pragma unused pid, dialogid, inputtext
 
     	if(!response)
     		return false;

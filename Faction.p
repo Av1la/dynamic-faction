@@ -39,7 +39,7 @@ enum E_FACTION_ATTRIB
 
 enum E_FACTION_RANK {
 	bool:FactionRank_Usable,
-	FactionRank_Name,
+	FactionRank_Name[FACTION_RANK_NAME_LIMIT],
 }
 
 new Faction[FACTION_LIMIT][E_FACTION_ATTRIB];

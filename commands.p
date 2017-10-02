@@ -5,7 +5,7 @@
 		/darlider
 
 	comandos para lider
-		* /gerenciarfaccao
+		/gerenciarfaccao
 		* /convidar
 
 	comandos para membros
@@ -94,6 +94,34 @@ command(darlider, playerid, params [])
     }
 
     Dialog_ShowCallback(playerid, using inline Response, DIALOG_STYLE_TABLIST_HEADERS, "Adicionando um novo Lider", dialog_list_content, "Selecionar", "Voltar");
+	return true;
+}
+
+/*
+	
+	COMANDOS PARA LDIERES
+	*********************
+	*********************
+
+*/
+
+command(gerenciarfaccao, playerid, params [])
+{
+	new member = MemberList_GetMemberIdById(playerid);
+	
+	if(member < 0) 
+	{
+		SendClientMessage(playerid, -1, "Você não faz parte de nenhuma facção.");
+		return true;
+	}
+
+	if(!MemberList_IsLeader(member))
+	{
+		SendClientMessage(playerid, -1, "Você não é o lider da sua facção atual.");
+		return true;		
+	}
+
+	Interface_LMemberList(playerid, MemberList_GetFaction(member));
 	return true;
 }
 
