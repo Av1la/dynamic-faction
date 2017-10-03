@@ -94,12 +94,7 @@ stock Interface_LMemberListMember(playerid, member)
     	}
 	}
 
-	format(tmp_str, sizeof tmp_str, 
-		"{009900}Promover{FFFFFF} para cargo %d\n{595959}Rebaixar{FFFFFF} cargo %d\n{ff0000}Expulsar da facção", 
-		(MemberList_GetRank(member)+1), (MemberList_GetRank(member)-1));
-
-	Dialog_ShowCallback(playerid, using inline Response, DIALOG_STYLE_LIST, 
-		"Lista de Membros -> Gerenciando Membro", tmp_str, "Selecionar", "Fechar");
-
+	format(tmp_str, sizeof tmp_str, "{009900}Promover{FFFFFF} para cargo %d\n{595959}Rebaixar{FFFFFF} cargo %d\n{ff0000}Expulsar da facção", (MemberList_GetRank(member)+1), (MemberList_GetRank(member)-1));
+	Dialog_ShowCallback(playerid, using inline Response, DIALOG_STYLE_LIST, "Lista de Membros -> Gerenciando Membro", tmp_str, "Selecionar", "Fechar");
 	return true;
 }

@@ -1,29 +1,26 @@
 /*
-
 	comandos para admin:
-		/administrarfaccoes (cria/apaga/edita)
-		/darlider
+	/administrarfaccoes
+	/darlider
 
-	comandos para lider
-		/gerenciarfaccao
-		* /convidar
+	comandos para lider:
+	/gerenciarfaccao
+	/convidar
 
-	comandos para membros
-		/r
-		/membros
-		/sairfaccao
+	comandos para membros:
+	/aceitarconvite
+	/r
+	/membros
+	/sairfaccao
 */
 
 
 
 /*
-	
 	COMANDOS PARA ADMINISTRADORES
 	*****************************
 	*****************************
 */
-
-
 
 /**
  * Comando - /administrarfaccoes
@@ -99,33 +96,100 @@ command(darlider, playerid, params [])
 
 /*
 	
-	COMANDOS PARA LDIERES
+	COMANDOS PARA LIDERES
 	*********************
 	*********************
 
 */
 
+/**
+ * Comando - /gerenciarfaccao
+ *
+ * usado pelo lider para alterar informacoes referente a facção.
+ *
+ * @return (bool) (undefined)
+ */	
 command(gerenciarfaccao, playerid, params [])
 {
 	new member = MemberList_GetMemberIdById(playerid);
 	
 	if(member < 0) 
-	{
-		SendClientMessage(playerid, -1, "Você não faz parte de nenhuma facção.");
-		return true;
-	}
+		return SendClientMessage(playerid, -1, "Você não faz parte de nenhuma facção.");
 
 	if(!MemberList_IsLeader(member))
-	{
-		SendClientMessage(playerid, -1, "Você não é o lider da sua facção atual.");
-		return true;		
-	}
+		return SendClientMessage(playerid, -1, "Você não é o lider da facção.");
 
 	Interface_LMemberList(playerid, MemberList_GetFaction(member));
 	return true;
 }
 
+/**
+ * Comando - /convidar
+ *
+ * usado pelo lider para convidar um novo membro.
+ *
+ * @return (bool) (undefined)
+ */	
+command(convidar, playerid, params [])
+{
+	new target 	= strval(params),
+		member 	= MemberList_GetMemberIdById(playerid),
+		faction = MemberList_GetFaction(member),
+		tmp_str[128];
 
+	if(member < 0) 
+		return SendClientMessage(playerid, -1, "Você não faz parte de nenhuma facção.");
+
+	if(!MemberList_IsLeader(member))
+		return SendClientMessage(playerid, -1, "Você não é o lider da facção.");
+
+	if(isnull(params))
+		return SendClientMessage(playerid, -1, "Sintax: /convidar [playerid]");
+
+	if(!IsPlayerConnected(target))
+		return SendClientMessage(playerid, -1, "Jogador invalido!");
+
+	if(MemberList_GetFactionTotMember(faction) >= Faction_GetMaxMembers(faction))
+		return SendClientMessage(playerid, -1, "A facção não possui vagas suficientes!");
+
+	if(MemberList_GetMemberIdById(target) < 0) 
+		return SendClientMessage(playerid, -1, "O jogador ja possui uma facção!");
+
+	format(tmp_str, sizeof tmp_str, " Você foi convidado para participar de uma facção. (%s por %s)", Faction_GetName(faction), MemberList_GetName(member));
+	SendClientMessage(target, -1, tmp_str);
+
+	MemberList_SetInvite(target, faction);
+	return true;
+}
+
+/**
+ * Comando - /aceitarconvite
+ *
+ * usado para aceitar um convite de facção.
+ *
+ * @return (bool) (undefined)
+ */	
+command(aceitarconvite, playerid, params)
+{
+	new player_name[MAX_PLAYER_NAME],
+		tmp_str[128];
+	
+	if(MemberList_GetMemberIdById(playerid) > 0) 
+		return true;
+
+	if(MemberList_GetInvite(playerid) < 0)
+		return SendClientMessage(playerid, -1, "Você não foi convidado por nenhuma facção!");
+
+	GetPlayerName(playerid, player_name, sizeof player_name);
+	
+	format(tmp_str, sizeof tmp_str, "%s ingressou na facção.", player_name);
+	MemberList_SendMessage(MemberList_GetInvite(playerid), tmp_str);
+
+	SendClientMessage(playerid, -1, "Parabens! Você ingressou na facção com sucesso!");
+	MemberList_Add(player_name, MemberList_GetInvite(playerid), 1);
+	MemberList_SetInvite(playerid, -1);
+	return true;
+}
 
 /*
 	
@@ -134,8 +198,6 @@ command(gerenciarfaccao, playerid, params [])
 	*********************
 
 */
-
-
 
 /**
  * Comando - /r
@@ -147,8 +209,10 @@ command(gerenciarfaccao, playerid, params [])
  */
 command(r, playerid, params []) 
 {
-	new member, faction, player_name[MAX_PLAYER_NAME], tmp_str[128];
-	member  = MemberList_GetMemberIdById(playerid);
+	new member = MemberList_GetMemberIdById(playerid),
+		faction,
+		player_name[MAX_PLAYER_NAME],
+		tmp_str[128];
 
 	if(member < 0) 
 	{
@@ -175,14 +239,15 @@ command(r, playerid, params [])
 /**
  * Comando - /membros
  *
- * exibe a lista de membros online da facção
+ * exibe a lista de membros da facção que estão online
  *
  * @return (bool) (undefined)
  */
 command(membros, playerid, params [])
 {
-	new member, faction, tmp_str[128];
-	member  = MemberList_GetMemberIdById(playerid);
+	new member = MemberList_GetMemberIdById(playerid),
+		faction,
+		tmp_str[128];
 
 	if(member < 0) 
 	{
@@ -219,7 +284,7 @@ command(membros, playerid, params [])
 /**
  * Comando - /sairfaccao
  *
- * Usado para um membro deixar a facção atual.
+ * o jogador usa para sair da facção.
  *
  * @return (bool) (undefined)
  */

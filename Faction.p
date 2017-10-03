@@ -1,5 +1,4 @@
 /*
-
 	Faction_Create(name[], embed_color[], hex_color)
 	Faction_Delete();
 
@@ -16,8 +15,6 @@
 	Faction_GetEmbbedColor(faction)
 	Faction_GetHexColor(faction)
 	Faction_GetMaxMembers(faction)
-
-	* inexistente
 */
 
 #define FACTION_LIMIT 				10
@@ -37,7 +34,8 @@ enum E_FACTION_ATTRIB
 	Faction_MaxMembers,
 } 
 
-enum E_FACTION_RANK {
+enum E_FACTION_RANK
+{
 	bool:FactionRank_Usable,
 	FactionRank_Name[FACTION_RANK_NAME_LIMIT],
 }

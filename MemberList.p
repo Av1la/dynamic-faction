@@ -23,10 +23,14 @@
 	MemberList_GetRank(memberid)
 	MemberList_GetJoinDate(memberid)
 	MemberList_GetLastPromotion(memberid)
+
+	MemberList_SetInvite(playerid, faction)
+	MemberList_GetInvite(playerid)
 */
 
-#define MEMBERLIST_LIMIT 100
+#include <YSI\y_hooks>
 
+#define MEMBERLIST_LIMIT 100
 
 enum E_MEMBERLIST
 {
@@ -41,7 +45,26 @@ enum E_MEMBERLIST
 }
 
 new MemberList[MEMBERLIST_LIMIT][E_MEMBERLIST];
+new MemberList_Invite[MAX_PLAYERS];
 new gMemberListIndex;
+
+
+/**
+ * OnGameModeInit
+ *
+ * Função chamada quando o gamemode é iniciado.
+ *
+ * @return (bool) (undefined)
+ */
+hook OnGameModeInit()
+{
+	for(new i = 0; i < MAX_PLAYERS; i++)
+	{
+		MemberList_SetInvite(i, -1);
+	}
+	return true;
+}
+
 
 /**
  * MemberList_Add
@@ -320,6 +343,19 @@ stock MemberList_GetLastPromotion(memberid)
 	return MemberList[memberid][MemberList_LastPromotion];
 }
 
+/**
+ * MemberList_GetInvite
+ *
+ * retorna se o jogador foi convidado ou não
+ *
+ * @param (int) (playerid) player id
+ * @return (int) (MemberList_Invite)
+ */
+stock MemberList_GetInvite(playerid)
+{
+	return MemberList_Invite[playerid];
+}
+
 
 /*                      
 ***  #####  ##### ######
@@ -447,5 +483,20 @@ stock MemberList_SetLastPromotion(memberid, promotion)
 		return false;
 
 	MemberList[memberid][MemberList_LastPromotion] = promotion;
+	return true;
+}
+
+/**
+ * MemberList_SetInvite
+ *
+ * define se o jogador foi convidado por uma organizacao ou não.
+ *
+ * @param (int) (playerid) player id
+ * @param (int) (faction) faction id
+ * @return (bool) (undefined)
+ */
+stock MemberList_SetInvite(playerid, faction)
+{
+	MemberList_Invite[playerid] = faction;
 	return true;
 }

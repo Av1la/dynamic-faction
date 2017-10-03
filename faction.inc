@@ -36,7 +36,6 @@ hook OnGameModeInit()
 	MemberList_Add("Jogador_12", factions[1], 2);
 	MemberList_Add("Jogador_13", factions[1], 1);
 	MemberList_SetLeader(member, true);	
-
 	return true;
 }
 
