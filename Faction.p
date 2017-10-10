@@ -1,26 +1,29 @@
 /*
-	Faction_Create(name[], embed_color[], hex_color)
-	Faction_Delete();
+Faction_Create(name[], embed_color[], hex_color)
+Faction_Delete(faction);
 
-	Faction_SetCreated(faction, bool:created)
-	Faction_SetUsable(faction, bool:usable)
-	Faction_SetName(faction, name)
-	Faction_SetEmbedColor(faction, embbed_color)
-	Faction_SetHexColor(faction, hex_color)
-	Faction_SetMaxMembers(faction, max_members)
+Faction_SetCreated(faction, bool:created)
+Faction_SetUsable(faction, bool:usable)
+Faction_SetName(faction, name)
+Faction_SetEmbedColor(faction, embbed_color)
+Faction_SetHexColor(faction, hex_color)
+Faction_SetMaxMembers(faction, max_members)
+Faction_SetRankName(faction, rank, rank_name[])
 
-	Faction_IsCreated(faction)
-	Faction_IsUsable(faction)
-	Faction_GetName(faction)
-	Faction_GetEmbbedColor(faction)
-	Faction_GetHexColor(faction)
-	Faction_GetMaxMembers(faction)
+Faction_IsCreated(faction)
+Faction_IsUsable(faction)
+Faction_GetName(faction)
+Faction_GetEmbbedColor(faction)
+Faction_GetHexColor(faction)
+Faction_GetMaxMembers(faction)
+Faction_GetRankName(faction, rank)
 */
+
 
 #define FACTION_LIMIT 				10
 #define FACTION_NAME_LIMIT 			24
-#define FACTION_RANK_LIMIT 			10
-#define FACTION_RANK_NAME_LIMIT 	12
+#define FACTION_RANK_LIMIT 			(10 + 1)
+#define FACTION_RANK_NAME_LIMIT 	24
 
 enum E_FACTION_ATTRIB
 {
@@ -41,7 +44,7 @@ enum E_FACTION_RANK
 }
 
 new Faction[FACTION_LIMIT][E_FACTION_ATTRIB];
-new FactionRank[FACTION_LIMIT][E_FACTION_RANK];
+new FactionRank[FACTION_LIMIT][FACTION_RANK_LIMIT][E_FACTION_RANK];
 
 new gFactionIndex;
 
@@ -121,6 +124,9 @@ stock Faction_Delete(faction)
  */
 stock Faction_IsCreated(faction)
 {
+	if(faction >= FACTION_LIMIT || faction < 0)
+		return false;
+
 	return Faction[faction][Faction_Created];
 }
 
@@ -134,6 +140,9 @@ stock Faction_IsCreated(faction)
  */
 stock Faction_IsUsable(faction)
 {
+	if(faction >= FACTION_LIMIT || faction < 0)
+		return false;
+
 	return Faction[faction][Faction_Usable];
 }
 
@@ -191,6 +200,29 @@ stock Faction_GetHexColor(faction)
 stock Faction_GetMaxMembers(faction)
 {
 	return Faction[faction][Faction_MaxMembers];
+}
+
+/**
+ * Faction_GetRankName
+ *
+ * retorna nome do rank (cargo)
+ *
+ * @param (int) (faction) faction id
+ * @param (int) (rank) rank id
+ * @return (bool) (undefined)
+ */
+stock Faction_GetRankName(faction, rank)
+{
+	new tmp_str[FACTION_RANK_NAME_LIMIT] = "Indefinido";
+	
+	if(!Faction_IsCreated(faction))
+		return tmp_str;
+
+	if(isnull(FactionRank[faction][rank][FactionRank_Name]))
+		return tmp_str;
+
+	format(tmp_str, sizeof tmp_str, "%s", FactionRank[faction][rank][FactionRank_Name]);
+	return tmp_str;
 }
 
 
@@ -302,5 +334,23 @@ stock Faction_SetMaxMembers(faction, max_members)
 		return false;
 
 	Faction[faction][Faction_MaxMembers] = max_members;
+	return true;
+}
+
+/**
+ * Faction_SetRankName
+ *
+ * altera o nome do rank (cargo)
+ *
+ * @param (int) (faction) faction id
+ * @param (int) (rank) rank id
+ * @return (bool) (undefined)
+ */
+stock Faction_SetRankName(faction, rank, rank_name[])
+{
+	if(!Faction_IsCreated(faction))
+		return false;
+	
+	format(FactionRank[faction][rank][FactionRank_Name], FACTION_RANK_NAME_LIMIT, "%s", rank_name);
 	return true;
 }

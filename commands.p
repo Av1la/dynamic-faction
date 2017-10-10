@@ -31,8 +31,9 @@
  */
 command(administrarfaccoes, playerid, params [])
 {
-	//if(IsPlayerAdmin(playerid))
-	Interface_AFaction(playerid);
+	if(IsPlayerAdmin(playerid)) {
+		Interface_Faction(playerid);
+	}
 	return true;
 }
 
@@ -46,51 +47,53 @@ command(administrarfaccoes, playerid, params [])
  */
 command(darlider, playerid, params []) 
 {
-	new dialog_list_content[512] = "#id\t#nome\n",
-		dialog_list[FACTION_LIMIT],
-		dialog_list_index,
-		target = strval(params);
+	if(IsPlayerAdmin(playerid)) {
+		new dialog_list_content[512] = "#id\t#nome\n",
+			dialog_list[FACTION_LIMIT],
+			dialog_list_index,
+			target = strval(params);
 
-	if(!IsPlayerConnected(target))
-		return false;
+		if(!IsPlayerConnected(target))
+			return false;
 
-    inline Response(pid, dialogid, response, listitem, string:inputtext[])
-    {
-        #pragma unused pid, dialogid, response, inputtext
+	    inline Response(pid, dialogid, response, listitem, string:inputtext[])
+	    {
+	        #pragma unused pid, dialogid, response, inputtext
 
-    	if(!response)
-    		return true;
+	    	if(!response)
+	    		return true;
 
-		new tmp_str[128],
-			member = MemberList_GetMemberIdById(target),
-			player_name[MAX_PLAYER_NAME];
+			new tmp_str[128],
+				member = MemberList_GetMemberIdById(target),
+				player_name[MAX_PLAYER_NAME];
 
-		// # verificando se o jogador faz parte de alguma facção.
-		if(member >= 0)
-		{
-			format(tmp_str, sizeof tmp_str, "Você foi removido da sua facção atual. (%s)", Faction_GetName(MemberList_GetFaction(member)));
+			// # verificando se o jogador faz parte de alguma facção.
+			if(member >= 0)
+			{
+				format(tmp_str, sizeof tmp_str, "Você foi removido da sua facção atual. (%s)", Faction_GetName(MemberList_GetFaction(member)));
+				SendClientMessage(target, -1, tmp_str);
+				MemberList_Remove(member);
+			}
+
+			GetPlayerName(target, player_name, sizeof player_name);
+			MemberList_SetLeader(MemberList_Add(player_name, dialog_list[listitem], 10), true);
+
+			format(tmp_str, sizeof tmp_str, "Você foi promovido a lider de uma facção. (%s)", Faction_GetName(dialog_list[listitem]));
 			SendClientMessage(target, -1, tmp_str);
-			MemberList_Remove(member);
-		}
+	    }
+	    
+	    for(new i = 0; i < FACTION_LIMIT; i++) 
+	    {
+	    	if(!Faction_IsCreated(i))
+	    		continue;
 
-		GetPlayerName(target, player_name, sizeof player_name);
-		MemberList_SetLeader(MemberList_Add(player_name, dialog_list[listitem], 10), true);
+	    	format(dialog_list_content, sizeof dialog_list_content, "%s.%d\t%s\n", dialog_list_content, i, Faction_GetName(i));  	
+	    	dialog_list[dialog_list_index] = i;
+	    	dialog_list_index++;
+	    }
 
-		format(tmp_str, sizeof tmp_str, "Você foi promovido a lider de uma facção. (%s)", Faction_GetName(dialog_list[listitem]));
-		SendClientMessage(target, -1, tmp_str);
-    }
-    
-    for(new i = 0; i < FACTION_LIMIT; i++) 
-    {
-    	if(!Faction_IsCreated(i))
-    		continue;
-
-    	format(dialog_list_content, sizeof dialog_list_content, "%s.%d\t%s\n", dialog_list_content, i, Faction_GetName(i));  	
-    	dialog_list[dialog_list_index] = i;
-    	dialog_list_index++;
-    }
-
-    Dialog_ShowCallback(playerid, using inline Response, DIALOG_STYLE_TABLIST_HEADERS, "Adicionando um novo Lider", dialog_list_content, "Selecionar", "Voltar");
+	    Dialog_ShowCallback(playerid, using inline Response, DIALOG_STYLE_TABLIST_HEADERS, "Adicionando um novo Lider", dialog_list_content, "Selecionar", "Voltar");
+	}
 	return true;
 }
 
@@ -119,7 +122,7 @@ command(gerenciarfaccao, playerid, params [])
 	if(!MemberList_IsLeader(member))
 		return SendClientMessage(playerid, -1, "Você não é o lider da facção.");
 
-	Interface_LMemberList(playerid, MemberList_GetFaction(member));
+	Interface_MemberList(playerid, MemberList_GetFaction(member));
 	return true;
 }
 
@@ -152,7 +155,7 @@ command(convidar, playerid, params [])
 	if(MemberList_GetFactionTotMember(faction) >= Faction_GetMaxMembers(faction))
 		return SendClientMessage(playerid, -1, "A facção não possui vagas suficientes!");
 
-	if(MemberList_GetMemberIdById(target) < 0) 
+	if(MemberList_GetMemberIdById(target) > 0) 
 		return SendClientMessage(playerid, -1, "O jogador ja possui uma facção!");
 
 	format(tmp_str, sizeof tmp_str, " Você foi convidado para participar de uma facção. (%s por %s)", Faction_GetName(faction), MemberList_GetName(member));
@@ -169,7 +172,7 @@ command(convidar, playerid, params [])
  *
  * @return (bool) (undefined)
  */	
-command(aceitarconvite, playerid, params)
+command(aceitarconvite, playerid, param [])
 {
 	new player_name[MAX_PLAYER_NAME],
 		tmp_str[128];
@@ -231,7 +234,7 @@ command(r, playerid, params [])
 	}
 
 	GetPlayerName(playerid, player_name, sizeof player_name);
-	format(tmp_str, sizeof tmp_str, "%s via Radio: %s", player_name, params);
+	format(tmp_str, sizeof tmp_str, "(%s) %s via Radio: %s",  Faction_GetRankName(faction, MemberList_GetRank(member)), player_name, params);
 	MemberList_SendMessage(faction, tmp_str);
 	return true;
 }
@@ -274,7 +277,7 @@ command(membros, playerid, params [])
 		if(MemberList_GetFaction(i) != faction)
 			continue;
 
-		format(tmp_str, sizeof tmp_str, "%s / %d", MemberList_GetName(i), MemberList_GetRank(i));
+		format(tmp_str, sizeof tmp_str, "%s / %s (%d)", MemberList_GetName(i), Faction_GetRankName(faction, MemberList_GetRank(i)), MemberList_GetRank(i));
 		SendClientMessage(playerid, -1, tmp_str);
 	}
 	return true;

@@ -1,7 +1,11 @@
 
 /*
+	Faction.p
+
+	Lista de Funções:
 	MemberList_Add(player_name[], faction, rank)
 	MemberList_Remove(memberid)
+	MemberList_RemoveAllFromFaction(faction)
 
 	MemberList_SendMessage(faction, text[])
 
@@ -12,6 +16,7 @@
 	MemberList_SetRank(memberid, rank)
 	MemberList_SetJoinDate(memberid, join_date)
 	MemberList_SetLastPromotion(memberid, promotion)
+	MemberList_SetInvite(playerid, faction)
 
 	MemberList_GetMemberIdById(playerid)
 	MemberList_IsUsable(memberid)
@@ -23,8 +28,6 @@
 	MemberList_GetRank(memberid)
 	MemberList_GetJoinDate(memberid)
 	MemberList_GetLastPromotion(memberid)
-
-	MemberList_SetInvite(playerid, faction)
 	MemberList_GetInvite(playerid)
 */
 
@@ -32,7 +35,7 @@
 
 #define MEMBERLIST_LIMIT 100
 
-enum E_MEMBERLIST
+enum E_MEMBERLIST_ATTRIB
 {
 	bool:MemberList_Usable,
 	bool:MemberList_Leader,
@@ -44,7 +47,7 @@ enum E_MEMBERLIST
 	MemberList_LastPromotion
 }
 
-new MemberList[MEMBERLIST_LIMIT][E_MEMBERLIST];
+new MemberList[MEMBERLIST_LIMIT][E_MEMBERLIST_ATTRIB];
 new MemberList_Invite[MAX_PLAYERS];
 new gMemberListIndex;
 
@@ -122,6 +125,21 @@ stock MemberList_Remove(memberid)
 	MemberList_SetUsable(memberid, false);
 	gMemberListIndex = memberid;
 	return true;
+}
+
+
+stock MemberList_RemoveAllFromFaction(faction)
+{
+	for(new i = 0; i < MEMBERLIST_LIMIT; i++)
+	{
+		if(!MemberList_IsUsable(i))
+			continue;
+
+		if(MemberList_GetFaction(i) != faction)
+			continue;
+		
+		MemberList_Remove(i);
+	}
 }
 
 /**
@@ -241,7 +259,6 @@ stock MemberList_GetFactionTotMember(faction)
 			continue;
 
 		total++;
-		break;
 	}
 	return total;	
 }
