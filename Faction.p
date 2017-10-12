@@ -77,8 +77,7 @@ stock Faction_Create(name[], embed_color[], hex_color)
 	Faction_SetHexColor(gFactionIndex, hex_color);
 	Faction_SetMaxMembers(gFactionIndex, 10);
 
-	gFactionIndex++;
-	return (gFactionIndex - 1);
+	return (gFactionIndex++);
 }
 
 /**

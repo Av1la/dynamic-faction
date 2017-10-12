@@ -2,6 +2,10 @@
 	comandos para admin:
 	/administrarfaccoes
 	/darlider
+	/setfac [facid] 
+	/setrank [rank (10 = lider)]
+	/vehfac [fac]
+	/vehrank [rank]
 
 	comandos para lider:
 	/gerenciarfaccao
@@ -95,6 +99,154 @@ command(darlider, playerid, params [])
 	    Dialog_ShowCallback(playerid, using inline Response, DIALOG_STYLE_TABLIST_HEADERS, "Adicionando um novo Lider", dialog_list_content, "Selecionar", "Voltar");
 	}
 	return true;
+}
+
+/**
+ * Comando - /setfac
+ *
+ * usado parar alterar a propria facção
+ *
+ * @return (bool) (undefined)
+ */	
+command(setfac, playerid, params [])
+{
+	if(IsPlayerAdmin(playerid))
+	{
+		new member = MemberList_GetMemberIdById(playerid);
+		new input  = strval(params);
+		new player_name[MAX_PLAYER_NAME];
+
+		if(isnull(params))
+		{
+			SendClientMessage(playerid, -1, "uso correto: /setfac [faction]");
+			return true;
+		}
+
+		if(!Faction_IsCreated(input))
+			return true;
+
+		if(input == MemberList_GetFaction(member))
+			return true;
+
+		if(member != MEMBERLIST_INVALID)
+		{
+			MemberList_Remove(member);
+			return true;
+		}
+
+		GetPlayerName(playerid, player_name, sizeof player_name);
+		MemberList_Add(player_name, input, 1);
+		return true;
+	}
+	return false;
+}
+
+
+/**
+ * Comando - /setrank
+ *
+ * usado para alterar o proprio rank na faccao atual.
+ *
+ * @return (bool) (undefined)
+ */	
+command(setrank, playerid, params [])
+{
+	if(IsPlayerAdmin(playerid))
+	{
+		new member = MemberList_GetMemberIdById(playerid);
+		new input  = strval(params);
+
+		if(isnull(params))
+		{
+			SendClientMessage(playerid, -1, "uso correto: /setrank [rank de 1 a 10]");
+			return true;
+		}
+
+		if(member == MEMBERLIST_INVALID)
+			return true;
+
+		if(MemberList_IsLeader(member) && input < 10)
+		{
+			MemberList_SetLeader(member, false);
+		}
+
+		if(!MemberList_IsLeader(member) && input == 10)
+		{
+			MemberList_SetLeader(member, true);
+		}
+
+		MemberList_SetRank(member, input);
+		return true;
+	}
+	return false;
+}
+
+/**
+ * Comando - /vehfac
+ *
+ * define o veiculo id como veiculo privado da faccao.
+ *
+ * @return (bool) (undefined)
+ */	
+command(vehfac, playerid, params [])
+{
+	if(IsPlayerAdmin(playerid))
+	{
+		if(!IsPlayerInAnyVehicle(playerid))
+			return SendClientMessage(playerid, -1, "Você precisa estar em um veiculo.");
+
+		if(isnull(params))
+			return SendClientMessage(playerid, -1, "uso correto: /vehfac [faction]");
+
+		if(!Faction_IsCreated(strval(params)))
+			return SendClientMessage(playerid, -1, "Facção invalida!");
+
+		new vehicleid = GetPlayerVehicleID(playerid);
+		new vehicle   = FactionVehicle_GetIdFromVehid(vehicleid);
+		
+		if(vehicle != FACTION_VEHICLE_INVALID)
+		{
+			SendClientMessage(playerid, -1, "Veiculo ja definido.. removendo... removido!");
+			FactionVehicle_Undef(vehicle);
+		}
+
+		FactionVehicle_Define(vehicleid, strval(params), 1);
+		SendClientMessage(playerid, -1, "Veiculo definido!");
+		return true;
+	}
+	return false;
+}
+
+/**
+ * Comando - /vehrank
+ *
+ * altera o rank de permissao do veiculo atual.
+ *
+ * @return (bool) (undefined)
+ */	
+command(vehrank, playerid, params [])
+{
+	if(IsPlayerAdmin(playerid))
+	{
+		if(!IsPlayerInAnyVehicle(playerid))
+			return SendClientMessage(playerid, -1, "Você precisa estar em um veiculo.");
+
+		if(isnull(params))
+			return SendClientMessage(playerid, -1, "uso correto: /vehrank [rank de 1 a 10]");
+
+		if(strval(params) > 10 || strval(params) < 1)
+			return SendClientMessage(playerid, -1, "Rank invalido, use de 1 a 10.");
+
+		new vehicleid = GetPlayerVehicleID(playerid);
+		new vehicle   = FactionVehicle_GetIdFromVehid(vehicleid);
+
+		if(vehicle == FACTION_VEHICLE_INVALID)
+			return SendClientMessage(playerid, -1, "O veiculo não pertence a nenhuma facção!"); 
+
+		FactionVehicle_SetRank(vehicle, strval(params));
+		return true;
+	}
+	return false;
 }
 
 /*

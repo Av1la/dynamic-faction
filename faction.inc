@@ -2,6 +2,7 @@
 // # inclui nucleo
 #include "kernel\faction\Faction.p"
 #include "kernel\faction\MemberList.p"
+#include "kernel\faction\Vehicle.p"
 
 // # inclui interface de interação
 #include "kernel\faction\Faction.interface.p"

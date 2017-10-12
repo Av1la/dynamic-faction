@@ -33,7 +33,8 @@
 
 #include <YSI\y_hooks>
 
-#define MEMBERLIST_LIMIT 100
+#define MEMBERLIST_LIMIT 	100
+#define MEMBERLIST_INVALID 	-1
 
 enum E_MEMBERLIST_ATTRIB
 {
@@ -97,8 +98,7 @@ stock MemberList_Add(player_name[], faction, rank)
 	MemberList_SetJoinDate(gMemberListIndex, gettime());
 	MemberList_SetLastPromotion(gMemberListIndex, gettime());
 
-	gMemberListIndex++;
-	return (gMemberListIndex - 1);
+	return (gMemberListIndex++);
 }
 
 /**
@@ -461,6 +461,9 @@ stock MemberList_SetFaction(memberid, faction)
 stock MemberList_SetRank(memberid, rank)
 {
 	if(!MemberList_IsUsable(memberid))
+		return false;
+
+	if(rank > 10 || rank < 1)
 		return false;
 
 	MemberList[memberid][MemberList_Rank] = rank;
