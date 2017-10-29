@@ -1,3 +1,6 @@
+#if defined _inc_impl
+	#undef _inc_impl
+#endif
 
 /*
 	Faction.p
@@ -33,26 +36,6 @@
 
 #include <YSI\y_hooks>
 
-#define MEMBERLIST_LIMIT 	100
-#define MEMBERLIST_INVALID 	-1
-
-enum E_MEMBERLIST_ATTRIB
-{
-	bool:MemberList_Usable,
-	bool:MemberList_Leader,
-
-	MemberList_Name[MAX_PLAYER_NAME],
-	MemberList_Faction,
-	MemberList_Rank,
-	MemberList_JoinDate,
-	MemberList_LastPromotion
-}
-
-new MemberList[MEMBERLIST_LIMIT][E_MEMBERLIST_ATTRIB];
-new MemberList_Invite[MAX_PLAYERS];
-new gMemberListIndex;
-
-
 /**
  * OnGameModeInit
  *
@@ -62,10 +45,7 @@ new gMemberListIndex;
  */
 hook OnGameModeInit()
 {
-	for(new i = 0; i < MAX_PLAYERS; i++)
-	{
-		MemberList_SetInvite(i, -1);
-	}
+	print("<Kernel\\Faction\\MemberList.p>");
 	return true;
 }
 
@@ -126,6 +106,10 @@ stock MemberList_Remove(memberid)
 	gMemberListIndex = memberid;
 	return true;
 }
+
+
+
+
 
 
 stock MemberList_RemoveAllFromFaction(faction)

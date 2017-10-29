@@ -1,4 +1,6 @@
-
+#if defined _inc_MemberList
+    #undef _inc_MemberList
+#endif
 /*
     MemberList.interface.p
 

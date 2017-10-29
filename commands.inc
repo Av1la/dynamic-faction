@@ -1,6 +1,10 @@
-/*
+#if defined _inc_commands
+	#undef _inc_commands
+#endif
+	
+/*	
 	comandos para admin:
-	/administrarfaccoes
+	/gerirfacs
 	/darlider
 	/setfac [facid] 
 	/setrank [rank (10 = lider)]
@@ -8,7 +12,7 @@
 	/vehrank [rank]
 
 	comandos para lider:
-	/gerenciarfaccao
+	/gerirfac
 	/convidar
 
 	comandos para membros:
@@ -18,6 +22,33 @@
 	/sairfaccao
 */
 
+#include <mSelection>
+
+enum {
+	SKIN_MENU,
+}
+
+command(skin, playerid, params)
+{
+	new skins[31] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30};
+
+	//ShowModelSelectionMenuEx(playerid, items_array[], item_amount, header_text[], extraid, Float:Xrot = 0.0, Float:Yrot = 0.0, Float:Zrot = 0.0, Float:mZoom = 1.0, dialogBGcolor = 0x4A5A6BBB, previewBGcolor = 0x88888899 , tdSelectionColor = 0xFFFF00AA)
+	ShowModelSelectionMenuEx(playerid, skins, sizeof skins, "  Escolha uma Skin", SKIN_MENU);
+	return true;
+}
+
+public OnPlayerModelSelectionEx(playerid, response, extraid, modelid)
+{
+	if(!response)
+		return true;
+
+	if(extraid == SKIN_MENU)
+	{
+		SetPlayerSkin(playerid, modelid);
+	}
+
+	return true;
+}
 
 
 /*
@@ -27,13 +58,13 @@
 */
 
 /**
- * Comando - /administrarfaccoes
+ * Comando - /gerirfacs
  *
  * Exibe um dialog para gerenciamento de facções
  *
  * @return (bool) (undefined)
  */
-command(administrarfaccoes, playerid, params [])
+command(gerirfacs, playerid, params [])
 {
 	if(IsPlayerAdmin(playerid)) {
 		Interface_Faction(playerid);
@@ -131,7 +162,6 @@ command(setfac, playerid, params [])
 		if(member != MEMBERLIST_INVALID)
 		{
 			MemberList_Remove(member);
-			return true;
 		}
 
 		GetPlayerName(playerid, player_name, sizeof player_name);
@@ -188,6 +218,8 @@ command(setrank, playerid, params [])
  *
  * @return (bool) (undefined)
  */	
+
+ /*
 command(vehfac, playerid, params [])
 {
 	if(IsPlayerAdmin(playerid))
@@ -211,11 +243,13 @@ command(vehfac, playerid, params [])
 		}
 
 		FactionVehicle_Define(vehicleid, strval(params), 1);
+		ChangeVehicleColor(vehicleid, Faction_GetColorVehicle(strval(params)), Faction_GetColorVehicle(strval(params)));
+
 		SendClientMessage(playerid, -1, "Veiculo definido!");
 		return true;
 	}
 	return false;
-}
+} */
 
 /**
  * Comando - /vehrank
@@ -224,6 +258,7 @@ command(vehfac, playerid, params [])
  *
  * @return (bool) (undefined)
  */	
+ /*
 command(vehrank, playerid, params [])
 {
 	if(IsPlayerAdmin(playerid))
@@ -247,7 +282,7 @@ command(vehrank, playerid, params [])
 		return true;
 	}
 	return false;
-}
+}*/
 
 /*
 	
@@ -258,13 +293,13 @@ command(vehrank, playerid, params [])
 */
 
 /**
- * Comando - /gerenciarfaccao
+ * Comando - /gerirfac
  *
  * usado pelo lider para alterar informacoes referente a facção.
  *
  * @return (bool) (undefined)
  */	
-command(gerenciarfaccao, playerid, params [])
+command(gerirfac, playerid, params [])
 {
 	new member = MemberList_GetMemberIdById(playerid);
 	
